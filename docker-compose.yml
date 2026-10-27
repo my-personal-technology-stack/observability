@@ -17,13 +17,23 @@ services:
       - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./config/grafana/dashboards:/var/lib/grafana/dashboards:ro
 
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - curl -fsS http://localhost:3000/api/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    container_name: observability-prometheus
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:9090:9090"
+
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
 
 volumes:
   grafana-data:
+  prometheus-data:
