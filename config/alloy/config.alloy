@@ -1,10 +1,12 @@
-// Discover Docker containers.
+// Discover Docker containers through the Docker Engine API.
+// The Docker socket must be mounted into the Alloy container.
 discovery.docker "containers" {
   host             = "unix:///var/run/docker.sock"
   refresh_interval = "5s"
 }
 
-// Convert Docker container names into Loki labels.
+// Convert Docker's container name metadata into a readable Loki label.
+// Docker container names are usually prefixed with "/".
 discovery.relabel "containers" {
   targets = discovery.docker.containers.targets
 
@@ -15,16 +17,20 @@ discovery.relabel "containers" {
   }
 }
 
-// Collect logs from Docker containers.
+// Read logs from the discovered containers.
+// Apply a common job label and the container-name relabeling rule.
 loki.source.docker "containers" {
-  host       = "unix:///var/run/docker.sock"
-  targets    = discovery.docker.containers.targets
-  labels     = { job = "docker" }
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.containers.targets
+  labels        = { job = "docker" }
   relabel_rules = discovery.relabel.containers.rules
+
+  // Forward collected entries to the Loki writer.
   forward_to = [loki.write.local.receiver]
 }
 
-// Send logs to Loki.
+// Send collected logs to the Loki HTTP ingestion endpoint.
+// The hostname "loki" is the Docker Compose service name.
 loki.write "local" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"

@@ -1,11 +1,18 @@
-
-# Local environment variables
+# Local environment variables and secrets.
+.env
 .env.local
+.env.*.local
 
-# Runtime data and secrets
+# Allow the non-secret environment template.
+!.env.example
+
+# Local application data and generated files.
 data/
-secrets/
+logs/
+*.log
 
-# Operating system files
+# Editor and operating system files.
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db

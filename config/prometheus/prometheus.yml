@@ -1,14 +1,20 @@
-# Global Prometheus configuration
+# Global settings applied to all scrape jobs unless overridden.
 global:
+  # Collect metrics every 15 seconds.
   scrape_interval: 15s
+
+  # Evaluate recording and alerting rules every 15 seconds.
   evaluation_interval: 15s
 
-# Metrics collection targets
+# Define the endpoints from which Prometheus collects metrics.
 scrape_configs:
+  # Collect Prometheus' own metrics.
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
 
+  # Collect container metrics exposed by cAdvisor.
+  # The service name is resolved through the Docker Compose network.
   - job_name: cadvisor
     static_configs:
       - targets: ["cadvisor:8080"]

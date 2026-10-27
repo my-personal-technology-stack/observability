@@ -1,17 +1,21 @@
 services:
+  # Grafana provides dashboards and a unified interface for metrics and logs.
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION}
     container_name: observability-grafana
     restart: unless-stopped
 
+    # Expose the web interface on the local machine only.
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
 
+    # Configure the initial administrator account.
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in your environment}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD}
       GF_USERS_ALLOW_SIGN_UP: "false"
 
+    # Persist Grafana state and load version-controlled provisioning files.
     volumes:
       - grafana-data:/var/lib/grafana
       - ./config/grafana/provisioning:/etc/grafana/provisioning:ro

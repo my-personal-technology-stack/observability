@@ -1,9 +1,15 @@
+# Grafana datasource provisioning configuration.
 apiVersion: 1
 
 datasources:
+  # Loki provides centralized container logs.
   - name: Loki
     uid: loki
     type: loki
+
+    # Query Loki from the Grafana server over the Compose network.
     access: proxy
     url: http://loki:3100
+
+    # Allow datasource settings to be edited from the Grafana UI.
     editable: true

@@ -1,11 +1,20 @@
+# Automatically load dashboards from the mounted directory.
 apiVersion: 1
 
 providers:
   - name: Docker
     orgId: 1
+
+    # Keep Docker monitoring dashboards in a dedicated Grafana folder.
     folder: Docker
     type: file
+
+    # Prevent dashboards from being deleted through the UI.
     disableDeletion: true
+
+    # Allow editing in Grafana while keeping the JSON source in Git.
     editable: true
+
     options:
+      # Path inside the Grafana container, not the host machine.
       path: /var/lib/grafana/dashboards

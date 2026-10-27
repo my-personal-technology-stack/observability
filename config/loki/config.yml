@@ -1,0 +1,49 @@
+# Disable multi-tenant authentication for this local deployment.
+# Do not expose Loki directly to untrusted networks.
+auth_enabled: false
+
+# Configure the Loki HTTP API.
+server:
+  http_listen_port: 3100
+
+# Shared storage and ring settings for a single-instance deployment.
+common:
+  path_prefix: /loki
+
+  # Store log chunks on the persistent Docker volume.
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+
+  # A single Loki instance does not require replication.
+  replication_factor: 1
+
+  ring:
+    kvstore:
+      store: inmemory
+
+# Configure the index schema used to store and query logs.
+schema_config:
+  configs:
+    - from: "2024-04-01"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+# Configure log retention and ingestion limits.
+limits_config:
+  # Keep logs for 15 days (360 hours).
+  retention_period: 360h
+
+  # Allow structured metadata in log entries.
+  allow_structured_metadata: true
+
+# Compact indexes and delete data that exceeds the retention period.
+compactor:
+  working_directory: /loki/compactor
+  retention_enabled: true
+  delete_request_store: filesystem
