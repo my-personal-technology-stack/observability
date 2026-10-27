@@ -52,6 +52,38 @@ services:
     devices:
       - /dev/kmsg
 
+  loki:
+    image: grafana/loki:${LOKI_VERSION}
+    container_name: observability-loki
+    restart: unless-stopped
+    command:
+      - "-config.file=/etc/loki/config.yml"
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - ./config/loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+
+  alloy:
+    image: grafana/alloy:v1.12.2
+    container_name: observability-alloy
+    restart: unless-stopped
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    ports:
+      - "127.0.0.1:12345:12345"
+    volumes:
+      - ./config/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - alloy-data:/var/lib/alloy/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+
 volumes:
   grafana-data:
   prometheus-data:
+  loki-data:
+  alloy-data:
