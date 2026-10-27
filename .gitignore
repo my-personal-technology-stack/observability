@@ -1,0 +1,11 @@
+
+# Local environment variables
+.env.local
+
+# Runtime data and secrets
+data/
+secrets/
+
+# Operating system files
+.DS_Store
+Thumbs.db
